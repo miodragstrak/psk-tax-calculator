@@ -968,8 +968,15 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
 
                     fetch('https://hooks.zapier.com/hooks/catch/26093056/uedm4zw/', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(leadPayload)
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            source: 'Steuerersparnis Rechner',
+                            name: name,
+                            email: email,
+                            income: income ? `${income} EUR` : '0 EUR',
+                            savings: savings.replace('€', 'EUR').trim(),
+                            timestamp: Date.now().toString()
+                        })
                     }).catch(err => {
                         console.error('Zapier webhook error (non-blocking):', err);
                     });
