@@ -245,6 +245,92 @@
             gap: 15px;
         }
 
+        /* ===== Lead Form Layout Override ===== */
+        .lead-gate{
+        background: #fff;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+
+        .lead-text{
+        margin: 0 0 12px 0;
+        font-size: 15px;
+        }
+
+        .lead-grid{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        }
+
+        .lead-grid input{
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        font-size: 15px;
+        }
+
+        .consent-box{
+            display: grid;
+            grid-template-columns: 18px 1fr;
+            gap: 10px;
+            align-items: start;
+            text-align: left;
+            margin-top: 12px;
+        }
+
+        .consent-box input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            padding: 0;
+            margin: 3px 0 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            accent-color: var(--color-primary);
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .consent-box label {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--color-text);
+            cursor: pointer;
+        }
+
+        .consent-box a{
+        color: #7b2d2d;
+        text-decoration: underline;
+        }
+
+        #unlock-analysis-btn{
+        margin-top: 14px;
+        width: 100%;
+        }
+
+        #unlock-analysis-btn:disabled{
+        opacity: 0.45;
+        cursor: not-allowed;
+        }
+
+        @media (max-width: 768px){
+            .lead-grid{ grid-template-columns: 1fr; }
+        }
+
+        /* ===== CTA Row Layout Override ===== */
+        .cta-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .cta-row button {
+            flex: 1;
+        }
+
         /* Configuración para Móvil (menos de 600px) */
         @media (max-width: 600px) {
             .btn-container {
@@ -486,6 +572,18 @@
             .footer {
                 border-radius: 0;
             }
+
+            .lead-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lead-grid button {
+                grid-column: span 1;
+            }
+
+            .cta-row {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -504,7 +602,7 @@
         <div class="content">
             <main class="card">
                 <h2 class="section-title">📊 Ihre Steuerdaten</h2>
-                <div class="input-grid">
+                <div class="input-grid" id="calculator-inputs">
                     <div class="form-group">
                         <label for="income">Zu versteuerndes Einkommen (€):</label>
                         <input type="number" id="income" min="0" step="1000" value="80000" placeholder="z.B. 80000">
@@ -523,63 +621,89 @@
 
             <section id="results" class="results-section" style="display: none;">
 
-                <div class="section">
-                    <h2 class="section-title">💰 Ihre aktuelle Steuerbelastung</h2>
-                    <div class="result-card">
-                        <div class="result-grid">
-                            <div class="result-item">
-                                <div class="result-label">Zu versteuerndes Einkommen</div>
-                                <div class="result-value" id="current-income">0 €</div>
-                            </div>
-                            <div class="result-item">
-                                <div class="result-label">Einkommensteuer</div>
-                                <div class="result-value" id="current-tax">0 €</div>
-                            </div>
-                            <div class="result-item">
-                                <div class="result-label">Durchschnittssteuersatz</div>
-                                <div class="result-value" id="current-avg-rate">0%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="savings-box">
+            <div class="savings-box">
                     <h3>🎯 Ihr Steueroptimierungspotenzial</h3>
                     <div class="savings-amount" id="total-savings">0 €</div>
                     <p style="font-size: 1.1rem;">Potenzielle Steuerersparnis durch strategische Gestaltung</p>
-                </div>
+            </div>
+            <div id="lead-gate" class="lead-gate" style="margin-top: 1rem; display:none;">
 
-                <div class="section">
-                    <h2 class="section-title">📈 Vorher / Nachher Vergleich</h2>
-                    <div class="comparison-card">
-                        <div class="comparison-side">
-                            <h3>❌ Ohne Optimierung</h3>
-                            <div class="result-grid">
-                                <div class="result-item">
-                                    <div class="result-label">Steuerlast</div>
-                                    <div class="result-value" id="before-tax-comp">0 €</div>
-                                </div>
-                                <div class="result-item">
-                                    <div class="result-label">Netto</div>
-                                    <div class="result-value" id="before-net">0 €</div>
-                                </div>
+            <p class="lead-text">
+                Geben Sie Ihre Kontaktdaten ein, um die vollständige Analyse zu erhalten:
+            </p>
+
+            <div class="lead-grid">
+                <input type="text" id="lead-name" placeholder="Ihr Name">
+                <input type="email" id="lead-email" placeholder="Ihre E-Mail">
+            </div>
+
+            <div class="consent-box">
+            <input type="checkbox" id="lead-consent">
+            <label for="lead-consent">
+                Ich willige ein, dass meine Angaben zur Kontaktaufnahme und zur Übersendung der Analyse gemäß der
+                <a href="https://steuerberatung-psk.com/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a>
+                verarbeitet werden. Ich kann meine Einwilligung jederzeit widerrufen.
+            </label>
+            </div>
+
+            <button id="unlock-analysis-btn" class="btn-main btn-secondary" disabled>
+                Vollständige Analyse anzeigen
+            </button>
+
+            </div>
+
+            <div id="analysis-sections" style="display:none;">
+
+            <div class="section">
+                <h2 class="section-title">💰 Ihre aktuelle Steuerbelastung</h2>
+                <div class="result-card">
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">Zu versteuerndes Einkommen</div>
+                            <div class="result-value" id="current-income">0 €</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Einkommensteuer</div>
+                            <div class="result-value" id="current-tax">0 €</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Durchschnittssteuersatz</div>
+                            <div class="result-value" id="current-avg-rate">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h2 class="section-title">📈 Vorher / Nachher Vergleich</h2>
+                <div class="comparison-card">
+                    <div class="comparison-side">
+                        <h3>❌ Ohne Optimierung</h3>
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <div class="result-label">Steuerlast</div>
+                                <div class="result-value" id="before-tax-comp">0 €</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Netto</div>
+                                <div class="result-value" id="before-net">0 €</div>
                             </div>
                         </div>
-                        <div class="comparison-side">
-                            <h3>✅ Mit Optimierung</h3>
-                            <div class="result-grid">
-                                <div class="result-item">
-                                    <div class="result-label">Neue Steuerlast</div>
-                                    <div class="result-value success" id="after-tax">0 €</div>
-                                </div>
-                                <div class="result-item">
-                                    <div class="result-label">Neuer Durchschnittssatz</div>
-                                    <div class="result-value success" id="after-rate">0%</div>
-                                </div>
+                    </div>
+                    <div class="comparison-side">
+                        <h3>✅ Mit Optimierung</h3>
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <div class="result-label">Neue Steuerlast</div>
+                                <div class="result-value success" id="after-tax">0 €</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Neuer Durchschnittssatz</div>
+                                <div class="result-value success" id="after-rate">0%</div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <div class="chart-container card">
                     <h3 style="margin-bottom: 20px; text-align: center;">Steuerbelastung im Vergleich</h3>
@@ -617,20 +741,24 @@
                         </div>
                     </div>
                 </div>
-                <div class="card" style="margin-top: 30px;">
-                    <h3>Ergebnis per E-Mail erhalten & Beratung buchen</h3>
-                    <p>Senden Sie sich die detaillierte Analyse als PDF zu und sichern Sie sich einen Termin.</p>
-                    <div class="input-grid" style="margin-top: 1rem;">
-                        <input type="text" id="lead-name" placeholder="Ihr Name">
-                        <input type="email" id="lead-email" placeholder="Ihre E-Mail">
-                    </div>
-                    <div class="btn-container">
-                        <button class="btn-main btn-success" onclick="generatePDFReport()">📄 PDF Herunterladen</button>
-                        <button class="btn-main btn-secondary"
-                            onclick="window.open('https://steuerberatung-psk.com/', '_blank')">🌐 Zur Website</button>
-                        <button class="btn-main btn-normal"
-                            onclick="window.open('https://calendly.com/simon-steuerberater-psk/erstgesprach-steuerberatung-psk', '_blank')">Termin
-                            Buchen</button>
+            </div>
+                    <div class="cta-row" style="display:none;" id="action-buttons">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 33%; padding-right: 10px;">   
+                                <button class="btn-main btn-success" onclick="generatePDFReport()">📄 PDF Herunterladen</button>
+                            </td>
+                            <td style="width: 33%; padding-right: 10px; padding-left: 10px;">
+                                <button class="btn-main btn-secondary"
+                                    onclick="window.open('https://steuerberatung-psk.com/', '_blank')">🌐 Zur Website</button>
+                            </td>
+                            <td style="width: 33%; padding-left: 10px;">    
+                                <button class="btn-main btn-normal"
+                                    onclick="window.open('https://calendly.com/simon-steuerberater-psk/erstgesprach-steuerberatung-psk', '_blank')">Termin
+                                Buchen</button>
+                            </td>
+                        </tr>
+                    </table>
                     </div>
                 </div>
             </section>
@@ -711,6 +839,22 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
 
         // --- FUNCIÓN PRINCIPAL DE CÁLCULO ---
         function calculateTax() {
+
+            const resultsDiv = document.getElementById('results');
+
+            if (!resultsDiv) {
+                console.error('Results section not found');
+                return false;
+            }
+
+            resultsDiv.style.display = 'block';
+
+            const emailSection = document.getElementById('lead-gate');
+                if (emailSection) emailSection.style.display = 'block';
+
+            const analysis = document.getElementById('analysis-sections');
+                if (analysis) analysis.style.display = 'none';
+
             try {
                 const incomeInput = document.getElementById('income');
                 if (!incomeInput) {
@@ -875,9 +1019,16 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             const income = document.getElementById('income').value;
             const savings = document.getElementById('total-savings').innerText;
 
+            const consentEl = document.getElementById('lead-consent');
+
             // Validación de campos
             if (!name || !email) {
                 alert("Bitte füllen Sie Name und E-Mail aus.");
+                return;
+            }
+
+            if (!consentEl || !consentEl.checked) {
+                alert("Bitte bestätigen Sie die Einwilligung.");
                 return;
             }
 
@@ -984,12 +1135,11 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                     alert(`Vielen Dank ${name}! Die Analyse wurde erstellt. Wir melden uns bei Ihnen.`);
 
                 } catch (error) {
-                        console.error('Error in calculateTax:', error);
-    alert(
-      'Fehler: ' + error.message
-    );
-    return false;
-
+                    console.error('Error in calculateTax:', error);
+                    alert(
+                    'Fehler: ' + error.message
+                    );
+                    return false;
                 } finally {
                     if (btn) {
                         btn.innerText = originalText;
@@ -1124,6 +1274,8 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                     this.style.opacity = '1';
                 }, false);
             });
+
+            initLeadValidation();
             
             console.log('iOS compatibility fixes initialized successfully');
         });
@@ -1149,7 +1301,87 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 return false;
             }
         }
+
+        function initLeadValidation(){
+            const btn = document.getElementById('unlock-analysis-btn');
+            const nameEl = document.getElementById('lead-name');
+            const emailEl = document.getElementById('lead-email');
+            const consentEl = document.getElementById('lead-consent');
+
+            if (!btn || !nameEl || !emailEl || !consentEl) {
+                console.log('Lead validation elements missing');
+                return;
+            }
+
+            if (btn.dataset.bound === "1") return;
+            btn.dataset.bound = "1";
+
+            function validEmail(v){
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+            }
+
+            function updateUnlockBtn(){
+                const ok =
+                    nameEl.value.trim().length > 1 &&
+                    validEmail(emailEl.value.trim()) &&
+                    consentEl.checked;
+
+                btn.disabled = !ok;
+                btn.style.opacity = ok ? '1' : '0.45';
+                btn.style.pointerEvents = ok ? 'auto' : 'none';
+            }
+
+            nameEl.addEventListener('input', updateUnlockBtn);
+            emailEl.addEventListener('input', updateUnlockBtn);
+            consentEl.addEventListener('change', updateUnlockBtn);
+
+            updateUnlockBtn();
+        }
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('unlock-analysis-btn');
+        const ctabtns = document.getElementById('action-buttons');
+        const emailBlock = document.getElementById('lead-gate');       // your email grid id
+        const analysis = document.getElementById('analysis-sections');  // your wrapper
+
+        if (!btn || !emailBlock || !analysis) {
+            console.error('[unlock] missing elements', {btn, emailBlock, analysis});
+            return;
+        }
+
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('[unlock] clicked');
+
+            const name = document.getElementById('lead-name')?.value?.trim();
+            const email = document.getElementById('lead-email')?.value?.trim();
+            
+            if (!name || !email) {
+            alert('Bitte Name und E-Mail eingeben.');
+            return;
+            }
+
+            emailBlock.style.display = 'none';
+            analysis.style.display = 'block';
+            btn.style.display = 'block';
+            ctabtns.style.display = 'block';
+
+
+            // show any inner blocks that still have display:none
+            analysis.querySelectorAll('[style*="display:none"], .section').forEach(el => {
+            el.style.display = 'block';
+            });
+
+            console.log('[unlock] shown', {
+            analysisDisplay: getComputedStyle(analysis).display,
+            childCount: analysis.children.length
+            });
+        });
+        });
+    </script>
+
 </body>
 
 </html>
