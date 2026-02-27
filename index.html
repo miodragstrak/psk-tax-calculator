@@ -999,14 +999,15 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
 
         // --- Download PDF and generate report ---
         async function generatePDFReport() {
-                // Ensure jsPDF is loaded (UMD build)
-                if (!window.jspdf || !window.jspdf.jsPDF) {
-                    console.error('jsPDF library not loaded:', window.jspdf);
-                    alert('PDF library not loaded. Please reload the page.');
-                    return;
-                }
 
-                const jsPDF = window.jspdf.jsPDF;
+            // Ensure jsPDF is loaded (UMD build)
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                console.error('jsPDF library not loaded:', window.jspdf);
+                alert('PDF library not loaded. Please reload the page.');
+                return;
+            }
+
+            const jsPDF = window.jspdf.jsPDF;
             // 1. Validaciones iniciales
             // const { jsPDF } = window.jspdf;
             if (!jsPDF) {
@@ -1104,35 +1105,7 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 // Guardar PDF
                 doc.save(`Analyse_${name}_PSK.pdf`);
 
-                    // --- PARTE B: LEAD → ZAPIER ---
-                    const leadPayload = {
-                        source: 'Steuerersparnis Rechner',
-                        name: name.substring(0, 50),
-                        email: email,
-                        income: income ? `${income} EUR` : '0 EUR',
-                        savings: savings.replace('€', 'EUR').trim(),
-                        date: new Date().toISOString().split('T')[0],
-                        timestamp: Date.now()
-                    };
-
-                    console.log('Sending lead to Zapier:', leadPayload);
-
-                    fetch('https://hooks.zapier.com/hooks/catch/26093056/uedm4zw/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: new URLSearchParams({
-                            source: 'Steuerersparnis Rechner',
-                            name: name,
-                            email: email,
-                            income: income ? `${income} EUR` : '0 EUR',
-                            savings: savings.replace('€', 'EUR').trim(),
-                            timestamp: Date.now().toString()
-                        })
-                    }).catch(err => {
-                        console.error('Zapier webhook error (non-blocking):', err);
-                    });
-
-                    alert(`Vielen Dank ${name}! Die Analyse wurde erstellt. Wir melden uns bei Ihnen.`);
+                alert(`Vielen Dank ${name}! Ihre Analyse wurde erfolgreich heruntergeladen.`);
 
                 } catch (error) {
                     console.error('Error in calculateTax:', error);
@@ -1303,6 +1276,7 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
         }
 
         function initLeadValidation(){
+
             const btn = document.getElementById('unlock-analysis-btn');
             const nameEl = document.getElementById('lead-name');
             const emailEl = document.getElementById('lead-email');
@@ -1336,6 +1310,65 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             consentEl.addEventListener('change', updateUnlockBtn);
 
             updateUnlockBtn();
+
+            // ===============================
+            // 🔥 ADD THIS PART BELOW
+            // ===============================
+
+            btn.addEventListener('click', async function(e){
+
+                e.preventDefault();
+
+                if (btn.disabled) return;
+
+                // Prevent duplicate sending
+                if (btn.dataset.sent === "1") return;
+                btn.dataset.sent = "1";
+
+                const name = nameEl.value.trim();
+                const email = emailEl.value.trim();
+                const savings = document.getElementById('total-savings')?.innerText || '';
+
+                const payload = {
+                    source: "Steuerersparnis Rechner",
+                    name: name,
+                    email: email,
+                    savings: savings,
+                    consent: true,
+                    timestamp: new Date().toISOString()
+                };
+
+                try {
+                    await fetch("https://hooks.zapier.com/hooks/catch/26093056/uedm4zw/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            source: "Steuerersparnis Rechner",
+                            name: name,
+                            email: email,
+                            savings: savings,
+                            consent: "true",
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+
+                    console.log("Lead sent to Zapier");
+
+                } catch (err) {
+                    console.error("Zapier error:", err);
+                }
+
+                // Unlock UI after sending
+                const analysis = document.getElementById('analysis-sections');
+                const cta = document.getElementById('cta-buttons');
+                const leadGate = document.getElementById('lead-gate');
+
+                if (analysis) analysis.style.display = 'block';
+                if (cta) cta.style.display = 'flex';
+                if (leadGate) leadGate.style.display = 'none';
+
+            });
+
         }
     </script>
 
