@@ -691,7 +691,7 @@
 
             <div class="g-recaptcha" data-sitekey="6LeuxnosAAAAABOQET6rBFXT2D-qm2C41vN4eCjQ"></div>
 
-            <button id="unlock-analysis-btn" class="btn-main btn-secondary" disabled>
+            <button id="unlock-analysis-btn" class="btn-main btn-secondary" data-callback="onCaptchaSuccess">
                 Vollständige Analyse anzeigen
             </button>
 
@@ -1337,11 +1337,12 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             }
 
             function updateUnlockBtn(){
+                const captchaOk = grecaptcha.getResponse().length > 0;
                 const ok =
                     nameEl.value.trim().length > 1 &&
                     validEmail(emailEl.value.trim()) &&
                     consentEl.checked &&
-                    captchaResponse.length > 0;
+                    captchaOk;
 
                 btn.disabled = !ok;
                 btn.style.opacity = ok ? '1' : '0.45';
@@ -1353,6 +1354,7 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             consentEl.addEventListener('change', updateUnlockBtn);
 
             updateUnlockBtn();
+            window.updateUnlockBtn = updateUnlockBtn;
 
             // ===============================
             // 🔥 ADD THIS PART BELOW
@@ -1417,8 +1419,14 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 if (leadGate) leadGate.style.display = 'none';
 
             });
-
         }
+
+        function onCaptchaSuccess() {
+            if (window.updateUnlockBtn) {
+                window.updateUnlockBtn();
+            }
+        }
+        
     </script>
 
     <script>
