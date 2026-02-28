@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steuerersparnis-Analyse | Steuerberatung PSK</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         :root {
             /* color pallete */
@@ -48,8 +49,9 @@
         }
 
         .container {
-            width: min(95%, 1100px);
-            margin: 2rem auto;
+            max-width: 100%;
+            width: 100%;
+            padding: 0 15px;
         }
 
         /* Hero Section */
@@ -316,19 +318,59 @@
         cursor: not-allowed;
         }
 
+        .g-recaptcha {
+            transform: scale(0.95);
+            transform-origin: 0 0;
+        }
+
+        @media (max-width: 480px) {
+            .g-recaptcha {
+                transform: scale(0.85);
+            }
+        }
+
         @media (max-width: 768px){
             .lead-grid{ grid-template-columns: 1fr; }
         }
 
-        /* ===== CTA Row Layout Override ===== */
+        /* Desktop layout */
         .cta-row {
             display: flex;
             gap: 16px;
-            margin-top: 24px;
+            justify-content: space-between;
+            flex-direction: column;
         }
 
         .cta-row button {
             flex: 1;
+        }
+
+        /* 🔥 Mobile fix */
+        @media (max-width: 768px) {
+
+            .cta-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .cta-row button {
+                width: 100%;
+            }
+
+        }
+
+        /* 🔥 MOBILE FIX */
+        @media (max-width: 768px) {
+
+            .cta-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .cta-row button {
+                width: 100%;
+            }
+
         }
 
         /* Configuración para Móvil (menos de 600px) */
@@ -547,8 +589,9 @@
         /* Responsive */
         @media (max-width: 600px) {
             .container {
+                max-width: 100%;
                 width: 100%;
-                padding: 0 10px;
+                padding: 0 15px;
             }
 
             .card {
@@ -646,6 +689,8 @@
             </label>
             </div>
 
+            <div class="g-recaptcha" data-sitekey="6LeuxnosAAAAABOQET6rBFXT2D-qm2C41vN4eCjQ"></div>
+
             <button id="unlock-analysis-btn" class="btn-main btn-secondary" disabled>
                 Vollständige Analyse anzeigen
             </button>
@@ -742,24 +787,21 @@
                     </div>
                 </div>
             </div>
-                    <div class="cta-row" style="display:none;" id="action-buttons">
-                    <table style="width: 100%;">
-                        <tr>
-                            <td style="width: 33%; padding-right: 10px;">   
-                                <button class="btn-main btn-success" onclick="generatePDFReport()">📄 PDF Herunterladen</button>
-                            </td>
-                            <td style="width: 33%; padding-right: 10px; padding-left: 10px;">
-                                <button class="btn-main btn-secondary"
-                                    onclick="window.open('https://steuerberatung-psk.com/', '_blank')">🌐 Zur Website</button>
-                            </td>
-                            <td style="width: 33%; padding-left: 10px;">    
-                                <button class="btn-main btn-normal"
-                                    onclick="window.open('https://calendly.com/simon-steuerberater-psk/erstgesprach-steuerberatung-psk', '_blank')">Termin
-                                Buchen</button>
-                            </td>
-                        </tr>
-                    </table>
-                    </div>
+            <div class="cta-row" id="action-buttons" style="display:none;">
+                <button class="btn-main btn-success" onclick="generatePDFReport()">
+                    📄 PDF Herunterladen
+                </button>
+
+                <button class="btn-main btn-secondary"
+                    onclick="window.open('https://steuerberatung-psk.com/', '_blank')">
+                    🌐 Zur Website
+                </button>
+
+                <button class="btn-main btn-normal"
+                    onclick="window.open('https://calendly.com/simon-steuerberater-psk/erstgesprach-steuerberatung-psk', '_blank')">
+                    Termin Buchen
+                </button>
+            </div>
                 </div>
             </section>
         </div>
@@ -1298,7 +1340,8 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 const ok =
                     nameEl.value.trim().length > 1 &&
                     validEmail(emailEl.value.trim()) &&
-                    consentEl.checked;
+                    consentEl.checked &&
+                    captchaResponse.length > 0;
 
                 btn.disabled = !ok;
                 btn.style.opacity = ok ? '1' : '0.45';
@@ -1320,6 +1363,14 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 e.preventDefault();
 
                 if (btn.disabled) return;
+
+                // ✅ reCAPTCHA check FIRST
+                const captchaResponse = grecaptcha.getResponse();
+
+                if (!captchaResponse) {
+                    alert("Bitte bestätigen Sie das reCAPTCHA.");
+                    return;
+                }
 
                 // Prevent duplicate sending
                 if (btn.dataset.sent === "1") return;
@@ -1360,11 +1411,9 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
 
                 // Unlock UI after sending
                 const analysis = document.getElementById('analysis-sections');
-                const cta = document.getElementById('cta-buttons');
                 const leadGate = document.getElementById('lead-gate');
 
                 if (analysis) analysis.style.display = 'block';
-                if (cta) cta.style.display = 'flex';
                 if (leadGate) leadGate.style.display = 'none';
 
             });
