@@ -689,9 +689,9 @@
             </label>
             </div>
 
-            <div class="g-recaptcha" data-sitekey="6LeuxnosAAAAABOQET6rBFXT2D-qm2C41vN4eCjQ"></div>
+            <div class="g-recaptcha" data-sitekey="6LeuxnosAAAAABOQET6rBFXT2D-qm2C41vN4eCjQ" data-callback="updateUnlockBtn" data-expired-callback="updateUnlockBtn"></div>
 
-            <button id="unlock-analysis-btn" class="btn-main btn-secondary" data-callback="onCaptchaSuccess">
+            <button id="unlock-analysis-btn" class="btn-main btn-secondary" disabled>
                 Vollständige Analyse anzeigen
             </button>
 
@@ -1336,8 +1336,13 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
             }
 
-            function updateUnlockBtn(){
-                const captchaOk = grecaptcha.getResponse().length > 0;
+            function updateUnlockBtn() {
+                let captchaOk = false;
+
+                if (typeof grecaptcha !== "undefined") {
+                    captchaOk = grecaptcha.getResponse().length > 0;
+                }
+
                 const ok =
                     nameEl.value.trim().length > 1 &&
                     validEmail(emailEl.value.trim()) &&
@@ -1426,7 +1431,7 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 window.updateUnlockBtn();
             }
         }
-        
+
     </script>
 
     <script>
