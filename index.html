@@ -1352,30 +1352,28 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 btn.style.pointerEvents = ok ? 'auto' : 'none';
             }
 
-            function onSubmit(token) {
-                // This runs AFTER captcha is validated
-
-                // continue with your unlock logic here
-                runUnlockAnalysis();
-            }
-
             nameEl.addEventListener('input', updateUnlockBtn);
             emailEl.addEventListener('input', updateUnlockBtn);
             consentEl.addEventListener('change', updateUnlockBtn);
 
             updateUnlockBtn();
             window.updateUnlockBtn = updateUnlockBtn;
+        }
 
             // ===============================
             // 🔥 ADD THIS PART BELOW
             // ===============================
 
 
+        function onSubmit(token) {
+            runUnlockAnalysis();
+        }
+
         async function runUnlockAnalysis() {
 
             if (btn.disabled) return;
-
             if (btn.dataset.sent === "1") return;
+
             btn.dataset.sent = "1";
 
             const name = nameEl.value.trim();
@@ -1402,7 +1400,6 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 console.error("Zapier error:", err);
             }
 
-            // Unlock UI
             const analysis = document.getElementById('analysis-sections');
             const leadGate = document.getElementById('lead-gate');
 
