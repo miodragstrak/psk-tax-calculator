@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steuerersparnis-Analyse | Steuerberatung PSK</title>
-    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
     <style>
         :root {
             /* color pallete */
@@ -841,8 +841,17 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
         // Variables globales para gráficas
         let myChart = null;       // Gráfica de Barras
         let projectionChart = null; // Gráfica de Línea
-
         let recaptchaWidgetId;
+
+        function onRecaptchaLoad() {
+            console.log("reCAPTCHA loaded");
+
+            recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
+                sitekey: '6LeuxnosAAAAABOQET6rBFXT2D-qm2C41vN4eCjQ',
+                size: 'invisible',
+                callback: onSubmit
+            });
+        }
 
         function initRecaptcha() {
             recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
@@ -1370,7 +1379,7 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 if (btn.disabled) return;
 
                 console.log("Executing reCAPTCHA...");
-                grecaptcha.execute();
+                grecaptcha.execute(recaptchaWidgetId);
             });
 
             nameEl.addEventListener('input', updateUnlockBtn);
@@ -1393,9 +1402,11 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
 
         async function runUnlockAnalysis() {
 
-            console.log("runUnlockAnalysis started");
+            const btn = document.getElementById('unlock-analysis-btn');
+            const nameEl = document.getElementById('lead-name');
+            const emailEl = document.getElementById('lead-email');
 
-            if (btn.disabled) return;
+            if (!btn || btn.disabled) return;
             if (btn.dataset.sent === "1") return;
 
             btn.dataset.sent = "1";
@@ -1404,15 +1415,17 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             const email = emailEl.value.trim();
             const savings = document.getElementById('total-savings')?.innerText || '';
 
+            console.log("runUnlockAnalysis started");
+
             try {
                 await fetch("https://hooks.zapier.com/hooks/catch/26093056/uedm4zw/", {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: new URLSearchParams({
                         source: "Steuerersparnis Rechner",
-                        name: name,
-                        email: email,
-                        savings: savings,
+                        name,
+                        email,
+                        savings,
                         consent: "true",
                         timestamp: new Date().toISOString()
                     })
@@ -1424,20 +1437,10 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 console.error("Zapier error:", err);
             }
 
-            const analysis = document.getElementById('analysis-sections');
-            const leadGate = document.getElementById('lead-gate');
-
-            if (analysis) analysis.style.display = 'block';
-            if (leadGate) leadGate.style.display = 'none';
+            document.getElementById('lead-gate').style.display = 'none';
+            document.getElementById('analysis-sections').style.display = 'block';
+            document.getElementById('action-buttons').style.display = 'block';
         }
-
-        window.onload = function() {
-            if (typeof grecaptcha !== "undefined") {
-                initRecaptcha();
-            }
-        };
-
-
 
         function onCaptchaSuccess() {
             if (window.updateUnlockBtn) {
@@ -1445,55 +1448,6 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             }
         }
 
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('unlock-analysis-btn');
-        const ctabtns = document.getElementById('action-buttons');
-        const emailBlock = document.getElementById('lead-gate');       // your email grid id
-        const analysis = document.getElementById('analysis-sections');  // your wrapper
-
-        if (!btn || !emailBlock || !analysis) {
-            console.error('[unlock] missing elements', {btn, emailBlock, analysis});
-            return;
-        }
-
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            if (btn.disabled) return;
-
-            console.log("Executing reCAPTCHA...");
-            grecaptcha.execute(recaptchaWidgetId);
-
-            console.log('[unlock] clicked');
-
-            const name = document.getElementById('lead-name')?.value?.trim();
-            const email = document.getElementById('lead-email')?.value?.trim();
-            
-            if (!name || !email) {
-            alert('Bitte Name und E-Mail eingeben.');
-            return;
-            }
-
-            emailBlock.style.display = 'none';
-            analysis.style.display = 'block';
-            btn.style.display = 'block';
-            ctabtns.style.display = 'block';
-
-
-            // show any inner blocks that still have display:none
-            analysis.querySelectorAll('[style*="display:none"], .section').forEach(el => {
-            el.style.display = 'block';
-            });
-
-            console.log('[unlock] shown', {
-            analysisDisplay: getComputedStyle(analysis).display,
-            childCount: analysis.children.length
-            });
-        });
-        });
     </script>
 
 </body>
