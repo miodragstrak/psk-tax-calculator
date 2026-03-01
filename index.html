@@ -1366,10 +1366,13 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
 
 
         function onSubmit(token) {
+            console.log("reCAPTCHA validated, token:", token?.slice?.(0,10));
             runUnlockAnalysis();
         }
 
         async function runUnlockAnalysis() {
+
+            console.log("runUnlockAnalysis started");
 
             if (btn.disabled) return;
             if (btn.dataset.sent === "1") return;
