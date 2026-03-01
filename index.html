@@ -1371,67 +1371,43 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             // ===============================
 
 
-        function runUnlockAnalysis() {        
-            btn.addEventListener('click', async function(e){
+        async function runUnlockAnalysis() {
 
-                e.preventDefault();
+            if (btn.disabled) return;
 
-                if (btn.disabled) return;
+            if (btn.dataset.sent === "1") return;
+            btn.dataset.sent = "1";
 
-                // ✅ reCAPTCHA check FIRST
-                const captchaResponse = grecaptcha.getResponse();
+            const name = nameEl.value.trim();
+            const email = emailEl.value.trim();
+            const savings = document.getElementById('total-savings')?.innerText || '';
 
-                if (!captchaResponse) {
-                    alert("Bitte bestätigen Sie das reCAPTCHA.");
-                    return;
-                }
+            try {
+                await fetch("https://hooks.zapier.com/hooks/catch/26093056/uedm4zw/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({
+                        source: "Steuerersparnis Rechner",
+                        name: name,
+                        email: email,
+                        savings: savings,
+                        consent: "true",
+                        timestamp: new Date().toISOString()
+                    })
+                });
 
-                // Prevent duplicate sending
-                if (btn.dataset.sent === "1") return;
-                btn.dataset.sent = "1";
+                console.log("Lead sent to Zapier");
 
-                const name = nameEl.value.trim();
-                const email = emailEl.value.trim();
-                const savings = document.getElementById('total-savings')?.innerText || '';
+            } catch (err) {
+                console.error("Zapier error:", err);
+            }
 
-                const payload = {
-                    source: "Steuerersparnis Rechner",
-                    name: name,
-                    email: email,
-                    savings: savings,
-                    consent: true,
-                    timestamp: new Date().toISOString()
-                };
+            // Unlock UI
+            const analysis = document.getElementById('analysis-sections');
+            const leadGate = document.getElementById('lead-gate');
 
-                try {
-                    await fetch("https://hooks.zapier.com/hooks/catch/26093056/uedm4zw/", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: new URLSearchParams({
-                            source: "Steuerersparnis Rechner",
-                            name: name,
-                            email: email,
-                            savings: savings,
-                            consent: "true",
-                            timestamp: new Date().toISOString()
-                        })
-                    });
-
-                    console.log("Lead sent to Zapier");
-
-                } catch (err) {
-                    console.error("Zapier error:", err);
-                }
-
-                // Unlock UI after sending
-                const analysis = document.getElementById('analysis-sections');
-                const leadGate = document.getElementById('lead-gate');
-
-                if (analysis) analysis.style.display = 'block';
-                if (leadGate) leadGate.style.display = 'none';
-
-            });
-        }
+            if (analysis) analysis.style.display = 'block';
+            if (leadGate) leadGate.style.display = 'none';
         }
 
         function onCaptchaSuccess() {
