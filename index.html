@@ -841,7 +841,7 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
         // Variables globales para gráficas
         let myChart = null;       // Gráfica de Barras
         let projectionChart = null; // Gráfica de Línea
-        let recaptchaWidgetId;
+        let recaptchaWidgetId = null;
 
         function onRecaptchaLoad() {
             console.log("reCAPTCHA loaded");
@@ -850,14 +850,6 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
                 sitekey: '6LeuxnosAAAAABOQET6rBFXT2D-qm2C41vN4eCjQ',
                 size: 'invisible',
                 callback: onSubmit
-            });
-        }
-
-        function initRecaptcha() {
-            recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
-                'sitekey': '6LeuxnosAAAAABOQET6rBFXT2D-qm2C41vN4eCjQ',
-                'size': 'invisible',
-                'callback': onSubmit
             });
         }
 
