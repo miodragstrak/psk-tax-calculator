@@ -323,6 +323,11 @@
             transform-origin: 0 0;
         }
 
+        .blur-result {
+            filter: blur(10px);
+            opacity: 0.6;
+        }
+
         @media (max-width: 480px) {
             .g-recaptcha {
                 transform: scale(0.85);
@@ -666,7 +671,7 @@
 
             <div class="savings-box">
                     <h3>🎯 Ihr Steueroptimierungspotenzial</h3>
-                    <div class="savings-amount" id="total-savings">0 €</div>
+                    <div class="savings-amount blur-result" id="total-savings">0 €</div>
                     <p style="font-size: 1.1rem;">Potenzielle Steuerersparnis durch strategische Gestaltung</p>
             </div>
             <div id="lead-gate" class="lead-gate" style="margin-top: 1rem; display:none;">
@@ -848,7 +853,7 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
                 sitekey: '6LeKAXwsAAAAAFG98mCNWcSANY23u4Z0X-V5XaMt',
                 size: 'invisible',
-                callback: onSubmit
+                callback: runUnlockAnalysis
             });
         }
 
@@ -1366,6 +1371,9 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
 
             btn.addEventListener("click", function(e) {
                 e.preventDefault();
+
+                const savings = document.getElementById('total-savings');
+                if (savings) savings.classList.remove('blur-result');
 
                 if (btn.disabled) return;
 
