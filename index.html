@@ -957,13 +957,15 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             document.getElementById('current-tax').textContent = formatCurrency(currentTax);
             document.getElementById('current-avg-rate').textContent = formatPercent(currentAvgRate);
 
-            document.getElementById('total-savings').textContent = formatCurrency(savingsYear1);
+            document.getElementById('total-savings').textContent = '**** €';
 
             document.getElementById('before-tax-comp').textContent = formatCurrency(currentTax);
             document.getElementById('before-net').textContent = formatCurrency(income - currentTax);
 
             document.getElementById('after-tax').textContent = formatCurrency(newTaxYear1);
             document.getElementById('after-rate').textContent = formatPercent(newAvgRate);
+
+            window.realSavingsValue = formatCurrency(savingsYear1);
 
             // Mostrar resultados
             const resultsDiv = document.getElementById('results');
@@ -983,6 +985,7 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
         }
 
         window.calculateTax = calculateTax;
+
 
         // --- PROYECCIÓN Y TABLA ---
         function generateForecast(baseIncome, isMarried, baseTax, iabTotal) {
@@ -1406,23 +1409,42 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
 
         async function runUnlockAnalysis() {
 
+            console.log("runUnlockAnalysis START");
+
             const btn = document.getElementById('unlock-analysis-btn');
             const nameEl = document.getElementById('lead-name');
             const emailEl = document.getElementById('lead-email');
+            const savingsEl = document.getElementById('total-savings');
 
-            if (!btn || btn.disabled) return;
-            if (btn.dataset.sent === "1") return;
+            // ✅ Reveal real value FIRST
+            if (savingsEl && window.realSavingsValue) {
+                savingsEl.textContent = window.realSavingsValue;
+            }
 
-            btn.dataset.sent = "1";
+            // ❌ REMOVE this blocking condition
+            // if (!btn || btn.disabled) return;
 
-            const name = nameEl.value.trim();
-            const email = emailEl.value.trim();
-            const savings = document.getElementById('total-savings')?.innerText || '';
+            if (btn && btn.dataset.sent === "1") return;
+            if (btn) btn.dataset.sent = "1";
 
-            console.log("runUnlockAnalysis started");
+            const name = nameEl?.value.trim() || '';
+            const email = emailEl?.value.trim() || '';
+            const savings = savingsEl?.innerText || '';
 
+            // ✅ SHOW UI IMMEDIATELY (before Zapier)
+            const leadGate = document.getElementById('lead-gate');
+            const analysis = document.getElementById('analysis-sections');
+            const cta = document.getElementById('action-buttons');
+
+            if (leadGate) leadGate.style.display = 'none';
+            if (analysis) analysis.style.display = 'block';
+            if (cta) cta.style.display = 'flex'; // better for buttons
+
+            console.log("UI unlocked");
+
+            // ✅ Send to Zapier in background (non-blocking)
             try {
-                await fetch("https://hooks.zapier.com/hooks/catch/26093056/uedm4zw/", {
+                fetch("https://hooks.zapier.com/hooks/catch/26093056/uedm4zw/", {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: new URLSearchParams({
@@ -1440,10 +1462,6 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             } catch (err) {
                 console.error("Zapier error:", err);
             }
-
-            document.getElementById('lead-gate').style.display = 'none';
-            document.getElementById('analysis-sections').style.display = 'block';
-            document.getElementById('action-buttons').style.display = 'block';
         }
 
         function onCaptchaSuccess() {
