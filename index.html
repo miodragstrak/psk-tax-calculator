@@ -671,7 +671,7 @@
 
             <div class="savings-box">
                     <h3>🎯 Ihr Steueroptimierungspotenzial</h3>
-                    <div class="savings-amount blur-result" id="total-savings">0 €</div>
+                    <div class="savings-amount" id="total-savings">0 €</div>
                     <p style="font-size: 1.1rem;">Potenzielle Steuerersparnis durch strategische Gestaltung</p>
             </div>
             <div id="lead-gate" class="lead-gate" style="margin-top: 1rem; display:none;">
@@ -957,15 +957,13 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             document.getElementById('current-tax').textContent = formatCurrency(currentTax);
             document.getElementById('current-avg-rate').textContent = formatPercent(currentAvgRate);
 
-            document.getElementById('total-savings').textContent = '**** €';
+            document.getElementById('total-savings').textContent = formatCurrency(savingsYear1);
 
             document.getElementById('before-tax-comp').textContent = formatCurrency(currentTax);
             document.getElementById('before-net').textContent = formatCurrency(income - currentTax);
 
             document.getElementById('after-tax').textContent = formatCurrency(newTaxYear1);
             document.getElementById('after-rate').textContent = formatPercent(newAvgRate);
-
-            window.realSavingsValue = formatCurrency(savingsYear1);
 
             // Mostrar resultados
             const resultsDiv = document.getElementById('results');
@@ -1375,9 +1373,6 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             btn.addEventListener("click", function(e) {
                 e.preventDefault();
 
-                const savings = document.getElementById('total-savings');
-                if (savings) savings.classList.remove('blur-result');
-
                 if (btn.disabled) return;
 
                     if (recaptchaWidgetId === null) {
@@ -1415,11 +1410,6 @@ E+kUWCtNFzxew993bS7MnVcgk2cGukQIk8S6EYC0ngegJRGqHaV0U7aqOjM3Rh7kxK6oRTL7j0zo02vI
             const nameEl = document.getElementById('lead-name');
             const emailEl = document.getElementById('lead-email');
             const savingsEl = document.getElementById('total-savings');
-
-            // ✅ Reveal real value FIRST
-            if (savingsEl && window.realSavingsValue) {
-                savingsEl.textContent = window.realSavingsValue;
-            }
 
             // ❌ REMOVE this blocking condition
             // if (!btn || btn.disabled) return;
